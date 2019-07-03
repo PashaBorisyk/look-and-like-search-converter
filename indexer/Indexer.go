@@ -3,9 +3,8 @@ package indexer
 import (
 	"log"
 	"look-and-like-search-converter/converter"
+	"look-and-like-search-converter/models"
 	"look-and-like-search-converter/web"
-	"look-and-like-web-scrapper/models"
-	converterModels "look-and-like-search-converter/models"
 	"time"
 )
 
@@ -23,7 +22,7 @@ func IndexProduct(product models.Product) error {
 	convertTimeToString(&content)
 	content["@search.action"] = "upload"
 
-	searchUploadModel := converterModels.NewSearchUploadModel(&content)
+	searchUploadModel := models.NewSearchUploadModel(&content)
 	err = web.UploadModelToIndex(searchUploadModel)
 
 	return err

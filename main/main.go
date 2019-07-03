@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 	"look-and-like-search-converter/indexer"
+	"look-and-like-search-converter/logger"
+	"look-and-like-search-converter/models"
 	"look-and-like-search-converter/mongoClient"
 	"look-and-like-search-converter/queue"
-	"look-and-like-web-scrapper/logger"
-	"look-and-like-web-scrapper/models"
 	"sync"
 )
 
@@ -50,6 +50,7 @@ func init() {
 func main() {
 	//RunIndex()
 
+	log.Println("Search Converter starting...")
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	queue.InitConsumer(&wg, func(id string) {
@@ -59,12 +60,14 @@ func main() {
 		} else {
 			err = processProduct(*product, err)
 			if err != nil {
-				log.Println("Error processing product :",err)
+				log.Println("Error processing product :", err)
 			}
 		}
 	})
 
+	log.Println("Search converter started")
 	wg.Wait()
+	log.Println("Search converter finished")
 }
 
 func RunIndex() {

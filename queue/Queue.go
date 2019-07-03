@@ -12,9 +12,9 @@ var consumer *cluster.Consumer
 var signals chan os.Signal
 
 func InitConsumer(wg *sync.WaitGroup, doOnNext func(id string)) {
-
 	defer wg.Done()
-	log.Println("InitConsumer kafka subscriber")
+
+	log.Println("Configuring kafka...")
 
 	// init (custom) config, enable errors and notifications
 	config := cluster.NewConfig()
@@ -25,10 +25,11 @@ func InitConsumer(wg *sync.WaitGroup, doOnNext func(id string)) {
 	brokers := []string{"localhost:9092"}
 	topics := []string{"ready_to_index_id"}
 	var err error
-	consumer, err = cluster.NewConsumer(brokers, "akka_streams_group", topics, config)
+	consumer, err = cluster.NewConsumer(brokers, "search-converter-group", topics, config)
 
 	if err != nil {
-		panic(err)
+		log.Println("Can not create kafka consumer: ", err)
+		return
 	}
 	defer consumer.Close()
 
@@ -50,7 +51,7 @@ func InitConsumer(wg *sync.WaitGroup, doOnNext func(id string)) {
 		}
 	}()
 
-	log.Println("Subscribe called")
+	log.Println("Kafka configuring done")
 
 	for {
 		select {
@@ -65,9 +66,5 @@ func InitConsumer(wg *sync.WaitGroup, doOnNext func(id string)) {
 	}
 
 	// consume messages, watch signals
-
-}
-
-func Subscribe(doOnNext func(id string)) {
 
 }

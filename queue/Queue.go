@@ -21,8 +21,11 @@ func InitConsumer(wg *sync.WaitGroup, doOnNext func(id string)) {
 	config.Consumer.Return.Errors = true
 	config.Group.Return.Notifications = true
 
-	// init consumer
-	brokers := []string{"localhost:9092"}
+	serverUrl := os.Getenv("KAFKA_SERVER_URL")
+	if serverUrl == "" {
+		panic("KAFKA_SERVER_URL environment variable must be provided")
+	}
+	brokers := []string{serverUrl}
 	topics := []string{"ready_to_index_id"}
 	var err error
 	consumer, err = cluster.NewConsumer(brokers, "search-converter-group", topics, config)

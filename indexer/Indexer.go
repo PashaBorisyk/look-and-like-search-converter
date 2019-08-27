@@ -21,6 +21,7 @@ func IndexProduct(product models.Product) error {
 	}
 	convertTimeToString(&content)
 	content["@search.action"] = "upload"
+	delete(content,"id")
 
 	searchUploadModel := models.NewSearchUploadModel(&content)
 	err = web.UploadModelToIndex(searchUploadModel)

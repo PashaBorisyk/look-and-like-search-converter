@@ -10,7 +10,7 @@ import (
 
 const contentType string = "application/json"
 const apiKey string = "FEBA1843F8CAA5916F0465CDD3F4A256"
-const url = "https://lookandlike.search.windows.net/indexes/look-and-like-test/docs/index?api-version=2019-05-06"
+const url = "https://lookandlike.search.windows.net/indexes/cosmosdb-index/docs/index?api-version=2019-05-06"
 
 func UploadModelToIndex(model interface{}) error {
 	bodyContent, err := json.Marshal(model)

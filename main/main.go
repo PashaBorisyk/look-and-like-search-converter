@@ -16,6 +16,36 @@ var totalFails = 0
 
 var collection = mongoClient.GetCollection("products")
 
+func init() {
+	logger.Init()
+}
+
+func main() {
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go runIndex(&wg)
+
+	log.Println("Search Converter starting...")
+	wg.Add(1)
+	queue.InitConsumer(&wg, func(id string) {
+		product, err := collection.GetByID(id)
+		if err != nil {
+			log.Println("Error getting product by ID :", err)
+		} else {
+			err = processProduct(*product, err)
+			if err != nil {
+				log.Println("Error processing product :", err)
+			}
+		}
+	})
+
+	log.Println("Search converter started")
+	wg.Wait()
+	log.Println("Search converter finished")
+}
+
+
 func processProduct(product models.Product, err error) error {
 
 	if err != nil {
@@ -43,36 +73,16 @@ func processProduct(product models.Product, err error) error {
 	return err
 }
 
-func init() {
-	logger.Init()
-}
+func runIndex(wg *sync.WaitGroup) {
 
-func main() {
-	//RunIndex()
+	log.Println("Starting scanning all documents...")
 
-	log.Println("Search Converter starting...")
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	queue.InitConsumer(&wg, func(id string) {
-		product, err := collection.GetByID(id)
-		if err != nil {
-			log.Println("Error getting product by ID :", err)
-		} else {
-			err = processProduct(*product, err)
-			if err != nil {
-				log.Println("Error processing product :", err)
-			}
-		}
-	})
-
-	log.Println("Search converter started")
-	wg.Wait()
-	log.Println("Search converter finished")
-}
-
-func RunIndex() {
-	err := collection.GetNotIndexedDocuments(processProduct)
+	err := collection.GetNotIndexedDocumentsWithoutBG(processProduct)
 	if err != nil {
 		log.Println("Foreach loop finished with error: ", err)
 	}
+
+	log.Println("Scanning all documents done")
+
+	wg.Done()
 }

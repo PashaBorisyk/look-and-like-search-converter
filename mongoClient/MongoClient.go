@@ -68,9 +68,12 @@ func decodeMultipleResult(cursor *mongo.Cursor, foreach func(product models.Prod
 	return err
 }
 
-func (holder *Collection) GetNotIndexedDocuments(foreach func(message models.Product, err error) error) error {
+func (holder *Collection) GetNotIndexedDocumentsWithoutBG(foreach func(message models.Product, err error) error) error {
 	ctx := createContext()
-	queryResult, err := holder.collection.Find(ctx, bson.M{"metaInformation.indexed": nil})
+	queryResult, err := holder.collection.Find(ctx, bson.M{
+		"metaInformation.indexed": nil,
+		"data.images.noBackgroundImageUrl": bson.M{"$ne":""},
+	})
 	if err != nil {
 		log.Println("Unable to get result from FindUnsentByReceiverUserID: ", err)
 	}
